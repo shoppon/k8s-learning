@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keystone-etc
+  namespace: keystone
+data:
+  keystone.conf: |+
+    [DEFAULT]
+    admin_token = vBjNhUXu
+    max_domain_tree_depth = 2
+    transport_url = rabbit://keystone:@rabbitmq.openstack.svc.cluster.local:5672/openstack
+    [auth]
+    methods = external,password,token,oauth1,application_credential,saml2
+    [cache]
+    backend = oslo_cache.memcache_pool
+    enabled = true
+    memcache_servers = memcached.openstack.svc.cluster.local:11211
+    [credential]
+    key_repository = /etc/keystone/credential-keys/
+    [database]
+    connection = mysql+pymysql://keystone:@mariadb.openstack.svc.cluster.local:3306/keystone
+    max_overflow = -1
+    max_retries = -1
+    [domain_quotas]
+    domain_quotas_enabled = true
+    quota_backup_gigabytes = -1
+    quota_backups = -1
+    quota_cores = -1
+    quota_floatingip = 65535
+    quota_gigabytes = -1
+    quota_instances = -1
+    quota_loadbalancer = -1
+    quota_network = -1
+    quota_port = -1
+    quota_ram = -1
+    quota_router = -1
+    quota_security_group = -1
+    quota_security_group_rule = -1
+    quota_snapshots = -1
+    quota_subnet = -1
+    quota_volumes = -1
+    [identity]
+    domain_configurations_from_database = true
+    domain_specific_drivers_enabled = true
+    [keystone_authtoken]
+    auth_url = http://keystone-api.openstack.svc.cluster.local:80/v3
+    domain_name = Default
+    password = IMZaLdFj
+    project_domain_name = Default
+    project_name = service
+    user_domain_name = Default
+    username = drone
+    [saml]
+    certfile = /etc/keystone/ssl/certs/signing_cert.pem
+    idp_contact_company = Example, Inc.
+    idp_contact_email = support@example.com
+    idp_contact_name = SAML Identity Provider Support
+    idp_contact_surname = Support
+    idp_contact_telephone = +1 800 555 0100
+    idp_entity_id = http://172.16.10.2/v3/OS-FEDERATION/saml2/metadata
+    idp_metadata_path = /etc/keystone/saml2_idp_metadata.xml
+    idp_organization_display_name = OpenStack SAML Identity Provider
+    idp_organization_name = SAML Identity Provider
+    idp_organization_url = https://example.com/
+    idp_sso_endpoint = http://172.16.10.2/v3/OS-FEDERATION/saml2/sso
+    keyfile = /etc/keystone/ssl/private/signing_key.pem
+    [saml2]
+    remote_id_attribute = Shib-Identity-Provider
+    [token]
+    driver = memcache_pool
+    expiration = 21600
+    provider = fernet
