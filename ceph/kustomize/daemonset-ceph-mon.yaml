@@ -14,15 +14,18 @@ spec:
         application: ceph
         component: mon
     spec:
+      hostNetwork: true
+      serviceAccount: default
+      hostPID: true
       initContainers:
         - name: init
           image: shoppon/ceph:16.2.10-ubuntu-20.04
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           command: ["/bin/bash"]
           args:
             - -c
             - >-
-              monmaptool --create --add {HOSTNAME} {IPADDR} --fsid {FSID} /etc/ceph/monmap
+              test -f /var/lib/ceph/monmap || monmaptool --create --add $(HOSTNAME) $(IPADDR) --fsid $(FSID) /var/lib/ceph/monmap
           env:
             - name: HOSTNAME
               value: shoppon
@@ -38,15 +41,17 @@ spec:
       containers:
         - name: ceph-mon
           image: shoppon/ceph:16.2.10-ubuntu-20.04
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
           command:
             [
               "ceph-mon",
-              "--mkfs",
+              "-d",
               "-i",
-              "{HOSTNAME}",
+              "$(HOSTNAME)",
               "--monmap",
-              "/etc/ceph/monmap",
+              "/var/lib/ceph/monmap",
               "--keyring",
               "/etc/ceph/ceph.mon.keyring",
             ]
@@ -57,12 +62,18 @@ spec:
             - name: ceph-etc
               mountPath: /etc/ceph
             - name: ceph-data
-              mountPath: /var/lib/ceph
+              mountPath: /var/lib/ceph/
+            - name: ceph-log
+              mountPath: /var/log/ceph
       volumes:
         - name: ceph-etc
           configMap:
             name: ceph-etc
         - name: ceph-data
           hostPath:
-            path: /var/lib/ceph
+            path: /var/lib/ceph/
+            type: DirectoryOrCreate
+        - name: ceph-log
+          hostPath:
+            path: /var/log/ceph/
             type: DirectoryOrCreate

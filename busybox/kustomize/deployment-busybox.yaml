@@ -20,6 +20,31 @@ spec:
           command: ["/bin/bash", "-c", "--"]
           args: ["while true; do sleep 30; done;"]
           imagePullPolicy: IfNotPresent
+          env:
+            - name: OS_USERNAME
+              value: admin
+            - name: OS_PASSWORD
+              value: password
+            - name: OS_AUTH_URL
+              value: http://keystone-api.openstack.svc.cluster.local:5000/v3
+            - name: OS_PROJECT_NAME
+              value: admin
+            - name: OS_USER_DOMAIN_NAME
+              value: Default
+            - name: OS_PROJECT_DOMAIN_NAME
+              value: Default
+            - name: OS_IDENTITY_API_VERSION
+              value: "3"
+            - name: OS_REGION_NAME
+              value: RegionOne
+            - name: OS_ENDPOINT_TYPE
+              value: adminURL
+            - name: OS_INTERFACE
+              value: adminURL
+            - name: OS_DEFAULT_DOMAIN
+              value: Default
+            - name: PYTHONIOENCODING
+              value: UTF-8
           resources:
             limits:
               cpu: 100m
@@ -34,6 +59,9 @@ spec:
             - name: kubectl
               mountPath: /usr/local/bin/kubectl
               readOnly: true
+            - name: ceph-etc
+              mountPath: /etc/ceph/
+              readOnly: true
       volumes:
         - name: kubectl
           hostPath:
@@ -43,3 +71,6 @@ spec:
           hostPath:
             path: /root/.kube/config
             type: File
+        - name: ceph-etc
+          configMap:
+            name: ceph-etc
