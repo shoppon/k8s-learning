@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ceph-mon
+  namespace: ceph
+spec:
+  selector:
+    matchLabels:
+      application: ceph
+      component: mon
+  template:
+    metadata:
+      labels:
+        application: ceph
+        component: mon
+    spec:
+      initContainers:
+        - name: init
+          image: shoppon/ceph:16.2.10-ubuntu-20.04
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/bash"]
+          args:
+            - -c
+            - >-
+              monmaptool --create --add {HOSTNAME} {IPADDR} --fsid {FSID} /etc/ceph/monmap
+          env:
+            - name: HOSTNAME
+              value: shoppon
+            - name: IPADDR
+              value: 192.168.5.100
+            - name: FSID
+              value: ff3db042-5bbe-42a9-91ec-d28b730edbaa
+          volumeMounts:
+            - name: ceph-etc
+              mountPath: /etc/ceph
+            - name: ceph-data
+              mountPath: /var/lib/ceph
+      containers:
+        - name: ceph-mon
+          image: shoppon/ceph:16.2.10-ubuntu-20.04
+          imagePullPolicy: IfNotPresent
+          command:
+            [
+              "ceph-mon",
+              "--mkfs",
+              "-i",
+              "{HOSTNAME}",
+              "--monmap",
+              "/etc/ceph/monmap",
+              "--keyring",
+              "/etc/ceph/ceph.mon.keyring",
+            ]
+          env:
+            - name: HOSTNAME
+              value: shoppon
+          volumeMounts:
+            - name: ceph-etc
+              mountPath: /etc/ceph
+            - name: ceph-data
+              mountPath: /var/lib/ceph
+      volumes:
+        - name: ceph-etc
+          configMap:
+            name: ceph-etc
+        - name: ceph-data
+          hostPath:
+            path: /var/lib/ceph
+            type: DirectoryOrCreate
