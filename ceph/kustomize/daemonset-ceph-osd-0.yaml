@@ -1,0 +1,101 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ceph-osd-0
+  namespace: ceph
+spec:
+  selector:
+    matchLabels:
+      application: ceph
+      component: osd-0
+  template:
+    metadata:
+      labels:
+        application: ceph
+        component: osd-0
+    spec:
+      hostNetwork: true
+      serviceAccount: default
+      hostPID: true
+      initContainers:
+        - name: prepare
+          image: shoppon/ceph:16.2.10-ubuntu-20.04
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
+          command: ["/bin/bash"]
+          args: ["/usr/ceph/ceph-osd-prepare-disk.sh", "/dev/sdd"]
+          volumeMounts:
+            - name: ceph-etc
+              mountPath: /etc/ceph
+            - name: ceph-bin
+              mountPath: /usr/ceph
+            - name: ceph-data
+              mountPath: /var/lib/ceph
+              mountPropagation: Bidirectional
+            - name: ceph-dev
+              mountPath: /dev
+            - name: ceph-etc
+              subPath: ceph.client.bootstrap-osd.keyring
+              mountPath: /var/lib/ceph/bootstrap-osd/ceph.keyring
+            - name: ceph-run
+              mountPath: /var/run/ceph
+      containers:
+        - name: ceph-osd
+          image: shoppon/ceph:16.2.10-ubuntu-20.04
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
+          command:
+            [
+              "ceph-osd",
+              "-f",
+              "--cluster",
+              "ceph",
+              "--id",
+              "0",
+              "-d"
+            ]
+          volumeMounts:
+            - name: ceph-etc
+              mountPath: /etc/ceph
+            - name: ceph-data
+              mountPath: /var/lib/ceph/
+            - name: ceph-log
+              mountPath: /var/log/ceph
+            - name: ceph-dev
+              mountPath: /dev
+            - name: ceph-run
+              mountPath: /var/run/ceph
+            - name: ceph-bin
+              mountPath: /usr/ceph
+            - name: ceph-etc
+              subPath: ceph.client.bootstrap-osd.keyring
+              mountPath: /var/lib/ceph/bootstrap-osd/ceph.keyring
+      volumes:
+        - name: ceph-etc
+          configMap:
+            name: ceph-etc
+        - name: ceph-bin
+          configMap:
+            name: ceph-bin
+        - name: ceph-data
+          hostPath:
+            path: /var/lib/ceph/
+            type: DirectoryOrCreate
+        - name: ceph-log
+          hostPath:
+            path: /var/log/ceph/
+            type: DirectoryOrCreate
+        - name: ceph-dev
+          hostPath:
+            path: /dev/
+            type: Directory
+        - name: ceph-run
+          hostPath:
+            path: /var/run/ceph
+            type: DirectoryOrCreate

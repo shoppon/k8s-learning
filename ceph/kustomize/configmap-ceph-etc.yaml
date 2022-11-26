@@ -20,6 +20,8 @@ data:
     osd pool default pg num = 512
     osd pool default pgp num = 512
     osd crush chooseleaf type = 1
+    mgr module path = /root/mgr
+    mgr initial modules = restful
   ceph.mon.keyring: |+
     [mon.]
         key = AQD+IH9jHIAUOBAAo2BuHdJog9kq2G5U3QrRrg==
@@ -41,7 +43,7 @@ data:
         caps mgr = "allow *"
         caps mon = "allow *"
         caps osd = "allow *"
-  ceph.osd.keyring: |+
+  ceph.client.bootstrap-osd.keyring: |+
     [client.bootstrap-osd]
         key = AQBMLH9jRJNbDhAAtB0n9G1fp+w9ryr7+2YbAw==
         caps mgr = "allow r"

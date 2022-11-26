@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ceph-bin
+  namespace: ceph
+data:
+  ceph-osd-prepare-disk.sh: |+
+    #!/bin/sh
+    set -ex
+
+    lvm_list=$(ceph-volume lvm list --format json) || true
+
+    if ! grep -q $1 <<< "$lvm_list"; then
+      echo "ceph-volume lvm prepare $1"
+      ceph-volume lvm prepare --data $1 --bluestore --no-systemd
+    fi
+
+    osd=$(python3 - <<EOF
+    import json
+    r = json.loads("""$lvm_list""")
+    for osd_id, lvms in r.items():
+      for lvm in lvms:
+        if '$1' in lvm['devices']:
+          print(osd_id, lvm['tags']['ceph.osd_fsid'], lvm['tags']['ceph.cluster_fsid'])
+          exit(0)
+    EOF
+    )
+
+    ID=$(echo $osd | cut -d' ' -f1)
+    UUID=$(echo $osd | cut -d' ' -f2)
+    FSID=$(echo $osd | cut -d' ' -f3)
+
+    ceph-volume lvm activate $ID $UUID --no-systemd
+
+    key=/var/lib/ceph/osd/ceph-$ID/keyring
+    if [ ! -f $key ]; then
+      echo "osd key not exists"
+      OSD_SECRET=$(ceph-authtool --gen-print-key)
+      ceph-authtool --create-keyring $key --name osd.$ID --add-key $OSD_SECRET
+      ceph auth del osd.$ID || true
+      ceph auth add osd.$ID osd 'allow *' mon 'allow rwx' -i /var/lib/ceph/osd/ceph-$ID/keyring
+    fi
+
+    cat $key
+
+    ceph-osd -i $ID --mkfs --osd-uuid $UUID
+    chown -R ceph:ceph /var/lib/ceph/osd/ceph-$ID
+
+  ceph-mgr-prepare.sh: |+
+    #!/bin/sh
+    set -ex
+
+    if [ ! -f /var/lib/ceph/mgr/ceph-x/keyring ]; then
+      echo "mgr key not exists"
+      mkdir -p /var/lib/ceph/mgr/ceph-x
+      ceph auth get-or-create mgr.x mon 'allow profile mgr' osd 'allow *' mds 'allow *' > /var/lib/ceph/mgr/ceph-x/keyring
+    fi
