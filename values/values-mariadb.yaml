@@ -1,0 +1,9 @@
+global:
+  storageClass: local-path
+namespaceOverride: openstack
+auth:
+  rootPassword: mariadb13579
+primary:
+  persistence:
+    storageClass: local-path
+    size: 50Gi

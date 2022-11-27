@@ -1,0 +1,9 @@
+controller:
+  hostNetwork: true
+  hostPort:
+    enabled: true
+  ingressClassResource:
+    default: true
+defaultBackend:
+  enabled: false
+  port: 80

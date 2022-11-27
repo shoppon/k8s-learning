@@ -1,0 +1,9 @@
+global:
+  storageClass: local-path
+namespaceOverride: openstack
+auth:
+  username: rabbitmq
+  password: rabbitmq13579
+persistence:
+  storageClass: local-path
+  size: 8Gi

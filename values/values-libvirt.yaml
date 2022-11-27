@@ -1,0 +1,3 @@
+images:
+  tags:
+    libvirt: "docker.io/openstackhelm/libvirt:zed"

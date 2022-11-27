@@ -1,0 +1,6 @@
+global:
+  storageClass: local-path
+persistence:
+  enabled: true
+  storageClass: local-path
+  size: 8Gi

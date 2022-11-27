@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      application: busybox
+      component: busybox
+  template:
+    metadata:
+      labels:
+        application: busybox
+        component: busybox
+    spec:
+      containers:
+        - image: shoppon/busybox:latest
+          name: busybox
+          command: ["/bin/bash", "-c", "--"]
+          args: ["while true; do sleep 30; done;"]
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 100m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          volumeMounts:
+            - name: kubecfg
+              mountPath: /root/.kube/config
+              readOnly: true
+            - name: kubectl
+              mountPath: /usr/local/bin/kubectl
+              readOnly: true
+      volumes:
+        - name: kubectl
+          hostPath:
+            path: /usr/bin/kubectl
+            type: File
+        - name: kubecfg
+          hostPath:
+            path: /root/.kube/config
+            type: File
