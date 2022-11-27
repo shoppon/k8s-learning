@@ -1,0 +1,15 @@
+- op: replace
+  path: /metadata/name
+  value: ceph-osd-1
+- op: replace
+  path: /spec/selector/matchLabels/component
+  value: osd-1
+- op: replace
+  path: /spec/template/metadata/labels/component
+  value: osd-1
+- op: replace
+  path: /spec/template/spec/initContainers/0/args/1
+  value: /dev/sde
+- op: replace
+  path: /spec/template/spec/containers/0/args/4
+  value: "1"

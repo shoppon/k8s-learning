@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: ceph-osd-0
+  name: ceph-osd
   namespace: ceph
 spec:
   selector:
     matchLabels:
       application: ceph
-      component: osd-0
+      component: osd
   template:
     metadata:
       labels:
         application: ceph
-        component: osd-0
+        component: osd
     spec:
       hostNetwork: true
       serviceAccount: default
@@ -50,16 +50,14 @@ spec:
             privileged: true
           # command: ["/bin/bash", "-c", "--"]
           # args: ["while true; do sleep 30; done;"]
-          command:
-            [
-              "ceph-osd",
-              "-f",
-              "--cluster",
-              "ceph",
-              "--id",
-              "0",
-              "-d"
-            ]
+          command: ["ceph-osd"]
+          args:
+            - "-f"
+            - "--cluster"
+            - "ceph"
+            - "--id"
+            - "0"
+            - "-d"
           volumeMounts:
             - name: ceph-etc
               mountPath: /etc/ceph
