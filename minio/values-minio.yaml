@@ -1,0 +1,30 @@
+global:
+  storageClass: csi-rbd-sc
+nameOverride: minio
+hostAliases:
+  - ip: "192.168.5.200"
+    hostnames:
+      - "minio-api.shoppon.club"
+extraEnvVars:
+  - name: MINIO_SERVER_URL
+    value: http://minio-api.shoppon.club:8888
+auth:
+  rootUser: admin
+  rootPassword: minio13579
+ingress:
+  enabled: true
+  hostname: minio.shoppon.club
+  ingressClassName: nginx
+  extraHosts:
+    - name: minio.shoppon.local
+      path: /
+apiIngress:
+  enabled: true
+  hostname: minio-api.shoppon.club
+  ingressClassName: nginx
+  extraHosts:
+    - name: minio-api.shoppon.local
+      path: /
+persistence:
+  storageClass: csi-rbd-sc
+  size: 500Gi

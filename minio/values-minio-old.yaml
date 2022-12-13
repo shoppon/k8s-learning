@@ -1,0 +1,28 @@
+nameOverride: minio
+hostAliases:
+  - ip: "192.168.5.200"
+    hostnames:
+      - "minio-api-old.shoppon.club"
+extraEnvVars:
+  - name: MINIO_SERVER_URL
+    value: http://minio-api-old.shoppon.club:8888
+auth:
+  rootUser: admin
+  rootPassword: minio222333
+ingress:
+  enabled: true
+  hostname: minio-old.shoppon.club
+  ingressClassName: nginx
+  extraHosts:
+    - name: minio-old.shoppon.local
+      path: /
+apiIngress:
+  enabled: true
+  hostname: minio-api-old.shoppon.club
+  ingressClassName: nginx
+  extraHosts:
+    - name: minio-api-old.shoppon.local
+      path: /
+persistence:
+  size: 500Gi
+  existingClaim: minio-old

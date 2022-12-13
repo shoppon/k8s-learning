@@ -7,13 +7,16 @@ data:
   ceph.conf: |+
     [global]
     fsid = ff3db042-5bbe-42a9-91ec-d28b730edbaa
-    mon initial members = shoppon
-    mon host = 192.168.5.100
+    mon initial members = t630
+    mon host = 192.168.5.200
     public network = 192.168.5.0/24
     cluster network = 192.168.5.0/24
     auth cluster required = cephx
     auth service required = cephx
     auth client required = cephx
+    # auth cluster required = none
+    # auth service required = none
+    # auth client required = none
     osd journal size = 1024
     osd pool default size = 2
     osd pool default min size = 1
@@ -22,6 +25,10 @@ data:
     osd crush chooseleaf type = 1
     mgr module path = /root/mgr
     mgr initial modules = restful
+    [osd]
+    debug_osd = 1/5
+    [mds.t630]
+    host = t630
   ceph.mon.keyring: |+
     [mon.]
         key = AQD+IH9jHIAUOBAAo2BuHdJog9kq2G5U3QrRrg==

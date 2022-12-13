@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: router
+  namespace: router
+  labels:
+    name: router
+spec:
+  rules:
+    - host: router.shoppon.club
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: router
+                port:
+                  number: 80

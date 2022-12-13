@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openwrt
+  namespace: openwrt
+  labels:
+    name: openwrt
+spec:
+  rules:
+    - host: openwrt.shoppon.club
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: openwrt
+                port:
+                  number: 80

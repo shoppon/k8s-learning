@@ -1,9 +1,9 @@
 - op: replace
   path: /metadata/name
-  value: ceph-osd-1
+  value: ceph-osd-3
 - op: replace
   path: /spec/template/spec/initContainers/0/args/1
-  value: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:3:0 # /dev/sdd
+  value: /dev/disk/by-path/pci-0000:88:00.0-ata-1 # /dev/sdg
 - op: replace
   path: /spec/template/spec/containers/0/args/4
-  value: "1"
+  value: "3"

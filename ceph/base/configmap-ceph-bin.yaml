@@ -7,12 +7,16 @@ data:
   ceph-osd-prepare-disk.sh: |+
     #!/bin/sh
     set -ex
+    # exit 0
+
+    realpath=$(readlink -f $1)
 
     lvm_list=$(ceph-volume lvm list --format json) || true
 
-    if ! grep -q $1 <<< "$lvm_list"; then
-      echo "ceph-volume lvm prepare $1"
-      ceph-volume lvm prepare --data $1 --bluestore --no-systemd
+    if ! grep -q $realpath <<< "$lvm_list"; then
+      echo "ceph-volume lvm prepare $realpath"
+      ceph-volume lvm prepare --data $realpath --bluestore --no-systemd
+      lvm_list=$(ceph-volume lvm list --format json) || true
     fi
 
     osd=$(python3 - <<EOF
@@ -20,7 +24,7 @@ data:
     r = json.loads("""$lvm_list""")
     for osd_id, lvms in r.items():
       for lvm in lvms:
-        if '$1' in lvm['devices']:
+        if '$realpath' in lvm['devices']:
           print(osd_id, lvm['tags']['ceph.osd_fsid'], lvm['tags']['ceph.cluster_fsid'])
           exit(0)
     EOF

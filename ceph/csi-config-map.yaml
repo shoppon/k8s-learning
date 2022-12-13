@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ceph-csi-config
+  namespace: ceph-csi-rbd
+data:
+  config.json: |-
+    [
+      {
+        "clusterID": "ff3db042-5bbe-42a9-91ec-d28b730edbaa",
+        "monitors": ["192.168.5.200:6789"]
+      }
+    ]

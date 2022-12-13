@@ -18,7 +18,7 @@ spec:
       serviceAccount: default
       hostPID: true
       initContainers:
-        - name: init
+        - name: monmap
           image: shoppon/ceph:16.2.10-ubuntu-20.04
           imagePullPolicy: Always
           command: ["/bin/bash"]
@@ -28,11 +28,27 @@ spec:
               test -f /var/lib/ceph/monmap || monmaptool --create --add $(HOSTNAME) $(IPADDR) --fsid $(FSID) /var/lib/ceph/monmap
           env:
             - name: HOSTNAME
-              value: shoppon
+              value: t630
             - name: IPADDR
-              value: 192.168.5.100
+              value: 192.168.5.200
             - name: FSID
               value: ff3db042-5bbe-42a9-91ec-d28b730edbaa
+          volumeMounts:
+            - name: ceph-etc
+              mountPath: /etc/ceph
+            - name: ceph-data
+              mountPath: /var/lib/ceph
+        - name: mkfs
+          image: shoppon/ceph:16.2.10-ubuntu-20.04
+          imagePullPolicy: Always
+          command: ["/bin/bash"]
+          args:
+            - -c
+            - >-
+              test -f /var/lib/ceph/mon/ceph-$(HOSTNAME) || ceph-mon --mkfs -i $(HOSTNAME) --monmap /var/lib/ceph/monmap --keyring /etc/ceph/ceph.mon.keyring
+          env:
+            - name: HOSTNAME
+              value: t630
           volumeMounts:
             - name: ceph-etc
               mountPath: /etc/ceph
@@ -41,7 +57,7 @@ spec:
       containers:
         - name: ceph-mon
           image: shoppon/ceph:16.2.10-ubuntu-20.04
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           # command: ["/bin/bash", "-c", "--"]
           # args: ["while true; do sleep 30; done;"]
           command:
@@ -57,7 +73,7 @@ spec:
             ]
           env:
             - name: HOSTNAME
-              value: shoppon
+              value: t630
           volumeMounts:
             - name: ceph-etc
               mountPath: /etc/ceph

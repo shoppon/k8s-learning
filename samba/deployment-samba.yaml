@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: samba
+  namespace: samba
+spec:
+  selector:
+    matchLabels:
+      application: samba
+      component: samba
+  template:
+    metadata:
+      labels:
+        application: samba
+        component: samba
+    spec:
+      hostNetwork: true
+      containers:
+        - image: shoppon/samba:latest
+          name: samba
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
+          command:
+            - "smbd"
+            - "-S"
+            - "-F"
+            - "--no-process-group"
+            - "--configfile"
+            - "/etc/samba_cephfs/samba.conf"
+            - "-d"
+            - "2"
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 8000m
+              memory: 8Gi
+            requests:
+              cpu: 8000m
+              memory: 8Gi
+          volumeMounts:
+            - name: ceph-etc
+              mountPath: /etc/ceph/
+              readOnly: true
+            - name: samba-etc
+              mountPath: /etc/samba_cephfs/
+              readOnly: true
+      volumes:
+        - name: ceph-etc
+          configMap:
+            name: ceph-etc
+        - name: samba-etc
+          configMap:
+            name: samba-etc

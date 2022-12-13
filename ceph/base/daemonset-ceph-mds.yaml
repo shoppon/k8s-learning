@@ -1,51 +1,40 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: ceph-mgr
+  name: ceph-mds
   namespace: ceph
 spec:
   selector:
     matchLabels:
       application: ceph
-      component: mgr
+      component: mds
   template:
     metadata:
       labels:
         application: ceph
-        component: mgr
+        component: mds
     spec:
       hostNetwork: true
       serviceAccount: default
       hostPID: true
-      initContainers:
-        - name: prepare
-          image: shoppon/ceph:16.2.10-ubuntu-20.04
-          imagePullPolicy: IfNotPresent
-          securityContext:
-            privileged: true
-          # command: ["/bin/bash", "-c", "--"]
-          # args: ["while true; do sleep 30; done;"]
-          command: ["/bin/bash", "/usr/ceph/ceph-mgr-prepare.sh"]
-          volumeMounts:
-            - name: ceph-etc
-              mountPath: /etc/ceph
-            - name: ceph-bin
-              mountPath: /usr/ceph
-            - name: ceph-data
-              mountPath: /var/lib/ceph
-            - name: ceph-dev
-              mountPath: /dev
-            - name: ceph-run
-              mountPath: /var/run/ceph
       containers:
-        - name: ceph-mgr
+        - name: ceph-mds
           image: shoppon/ceph:16.2.10-ubuntu-20.04
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           securityContext:
             privileged: true
           # command: ["/bin/bash", "-c", "--"]
           # args: ["while true; do sleep 30; done;"]
-          command: ["ceph-mgr", "-i", "x", "-d"]
+          command: ["ceph-mds"]
+          args:
+            - "-f"
+            - "--cluster"
+            - "ceph"
+            - "--id"
+            - "t630"
+            - "-d"
+            - "-m"
+            - "192.168.5.200:6789"
           volumeMounts:
             - name: ceph-etc
               mountPath: /etc/ceph

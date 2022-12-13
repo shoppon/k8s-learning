@@ -2,14 +2,8 @@
   path: /metadata/name
   value: ceph-osd-0
 - op: replace
-  path: /spec/selector/matchLabels/component
-  value: osd-0
-- op: replace
-  path: /spec/template/metadata/labels/component
-  value: osd-0
-- op: replace
   path: /spec/template/spec/initContainers/0/args/1
-  value: /dev/sdd
+  value: /dev/disk/by-path/pci-0000:03:00.0-scsi-0:2:1:0 # /dev/sdb
 - op: replace
   path: /spec/template/spec/containers/0/args/4
   value: "0"

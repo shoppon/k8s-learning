@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-pvc
+spec:
+  volumes:
+    - name: ceph-rbd-fio
+      persistentVolumeClaim:
+        claimName: ceph-rbd-fio
+  containers:
+    - name: fio
+      image: shoppon/busybox:latest
+      command: ["/bin/bash", "-c", "--"]
+      args: ["while true; do sleep 30; done;"]
+      volumeMounts:
+        - mountPath: "/mnt/fio"
+          name: ceph-rbd-fio

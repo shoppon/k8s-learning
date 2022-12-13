@@ -20,16 +20,19 @@ spec:
       initContainers:
         - name: prepare
           image: shoppon/ceph:16.2.10-ubuntu-20.04
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
           # command: ["/bin/bash", "-c", "--"]
           # args: ["while true; do sleep 30; done;"]
           command: ["/bin/bash"]
-          args: ["/usr/ceph/ceph-osd-prepare-disk.sh", "/dev/sdd"]
+          args: ["/usr/ceph/ceph-osd-prepare-disk.sh", "/dev"]
           volumeMounts:
             - name: ceph-etc
               mountPath: /etc/ceph
+            - name: ceph-etc
+              subPath: ceph.client.bootstrap-osd.keyring
+              mountPath: /var/lib/ceph/bootstrap-osd/ceph.keyring
             - name: ceph-bin
               mountPath: /usr/ceph
             - name: ceph-data
@@ -37,15 +40,12 @@ spec:
               mountPropagation: Bidirectional
             - name: ceph-dev
               mountPath: /dev
-            - name: ceph-etc
-              subPath: ceph.client.bootstrap-osd.keyring
-              mountPath: /var/lib/ceph/bootstrap-osd/ceph.keyring
             - name: ceph-run
               mountPath: /var/run/ceph
       containers:
         - name: ceph-osd
           image: shoppon/ceph:16.2.10-ubuntu-20.04
-          imagePullPolicy: Always
+          imagePullPolicy: IfNotPresent
           securityContext:
             privileged: true
           # command: ["/bin/bash", "-c", "--"]

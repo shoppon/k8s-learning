@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: samba-etc
+  namespace: samba
+data:
+  samba.conf: |+
+    [global]
+    server role = standalone server
+
+    [nas]
+    vfs objects = ceph
+    path = /
+    kernel share modes = no
+    ceph:config_file = /etc/ceph/ceph.conf
+    ceph:user_id = admin
+    valid users = root, shoppon
+    read only = no
+
+    [tv]
+    vfs objects = ceph
+    path = /tv
+    kernel share modes = no
+    ceph:config_file = /etc/ceph/ceph.conf
+    ceph:user_id = admin
+    read list = @root, wxd
+    read only = yes
