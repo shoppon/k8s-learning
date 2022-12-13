@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ddns-bin
+  namespace: ddns
+data:
+  ddns.py: |+
+    #! /usr/bin/python
+    import requests
+    import logging
+    from logging import Formatter
+    from logging import StreamHandler
+    from logging.handlers import SysLogHandler
+    from socket import gethostbyname
+
+
+    def get_logger():
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        formatter = Formatter("%(asctime)s [%(module)s] %(message)s")
+
+        stream_handler = StreamHandler()
+        stream_handler.setFormatter(formatter)
+        logger.addHandler(stream_handler)
+
+        return logger
+
+
+    def get_current_dns():
+        return gethostbyname('shoppon.club')
+
+
+    def get_current_ip():
+        return requests.get('http://jsonip.com').json().get('ip')
+
+
+    def config_dns(new_ip):
+        resp = requests.put('https://api.godaddy.com/v1/domains/shoppon.club/records/A', json=[{
+            'data': new_ip,
+            'name': '@'
+        }], headers={
+            'accept': 'application/json',
+            'X-Shopper-Id': '39039331',
+            'Content-Type': 'application/json',
+            'Authorization': 'sso-key 9Zw16udsgXS_7PpmdPmfM1UGATWUzV7zJC:Qg2Khs5jEMiRJAA627psJ7'
+        })
+        logger.info(f'Status: {resp.status_code}')
+
+
+    if __name__ == '__main__':
+        logger = get_logger()
+        my_ip = get_current_ip()
+        dns_ip = get_current_dns()
+        logger.info(f'My ip: {my_ip}, current dns: {dns_ip}')
+        if my_ip != dns_ip:
+            logger.info(f'Set dns ip: {my_ip}')
+            config_dns(my_ip)

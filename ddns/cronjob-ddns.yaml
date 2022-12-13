@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ddns
+  namespace: ddns
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: ddns
+              image: shoppon/busybox:latest
+              imagePullPolicy: IfNotPresent
+              command:
+                - python3
+                - /usr/local/bin/ddns.py
+              volumeMounts:
+                - name: ddns-bin
+                  mountPath: /usr/local/bin/ddns.py
+                  subPath: ddns.py
+                  readOnly: true
+          restartPolicy: OnFailure
+          volumes:
+            - name: ddns-bin
+              configMap:
+                name: ddns-bin
