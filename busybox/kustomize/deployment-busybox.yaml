@@ -62,6 +62,8 @@ spec:
             - name: ceph-etc
               mountPath: /etc/ceph/
               readOnly: true
+            - name: nas
+              mountPath: /mnt/nas
       volumes:
         - name: kubectl
           hostPath:
@@ -74,3 +76,6 @@ spec:
         - name: ceph-etc
           configMap:
             name: ceph-etc
+        - name: nas
+          hostPath:
+            path: /mnt/nas

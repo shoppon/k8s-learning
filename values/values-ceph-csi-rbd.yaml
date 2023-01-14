@@ -27,7 +27,10 @@ serviceAccounts:
 #       - "<MONValue2>"
 #     rbd:
 #       netNamespaceFilePath: "{{ .kubeletDir }}/plugins/{{ .driverName }}/net"
-csiConfig: []
+csiConfig:
+  - clusterID: "ff3db042-5bbe-42a9-91ec-d28b730edbaa"
+    monitors:
+      - "192.168.5.200:6789"
 
 # Configuration details of clusterID,PoolID and FscID mapping
 # csiMapping:
@@ -313,7 +316,7 @@ storageClass:
   # (optional) uncomment the following to use rbd-nbd as mounter
   # on supported nodes
   # mounter: rbd-nbd
-  mounter: "rbd-nbd"
+  mounter: "krbd"
 
   # (optional) ceph client log location, eg: rbd-nbd
   # By default host-path /var/log/ceph of node is bind-mounted into
