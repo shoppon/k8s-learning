@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wechatgpt
+  namespace: wechatgpt
+spec:
+  selector:
+    matchLabels:
+      application: wechatgpt
+      component: wechatgpt
+  template:
+    metadata:
+      labels:
+        application: wechatgpt
+        component: wechatgpt
+    spec:
+      containers:
+        - image: shoppon/wechatgpt:latest
+          name: wechatgpt
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
+          command: ["/bin/bash", "/usr/bin/start.sh"]
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+            requests:
+              cpu: 2000m
+              memory: 2Gi
+          volumeMounts:
+            - name: wechatgpt-etc
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+              readOnly: true
+            - name: wechatgpt-etc
+              mountPath: /usr/bin/start.sh
+              subPath: start.sh
+              readOnly: true
+      volumes:
+        - name: wechatgpt-etc
+          configMap:
+            name: wechatgpt-etc
