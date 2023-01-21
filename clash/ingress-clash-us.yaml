@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: clash-us
+  namespace: clash
+  labels:
+    name: clash-us
+spec:
+  rules:
+    - host: proxy-us.shoppon.club
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: clash-us
+                port:
+                  number: 7890
+    - host: proxy-us.shoppon.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: clash-us
+                port:
+                  number: 7890

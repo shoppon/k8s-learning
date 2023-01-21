@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: clash
+  name: clash-all
   namespace: clash
 spec:
   selector:
     matchLabels:
       application: clash
-      component: clash
+      component: clash-all
   template:
     metadata:
       labels:
         application: clash
-        component: clash
+        component: clash-all
     spec:
       containers:
         - image: shoppon/clash:latest
@@ -34,7 +34,7 @@ spec:
           volumeMounts:
             - name: clash-etc
               mountPath: /etc/clash/config.yaml
-              subPath: config.yaml
+              subPath: all.yaml
               readOnly: true
       volumes:
         - name: clash-etc

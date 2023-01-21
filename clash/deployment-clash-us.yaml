@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: clash-us
+  namespace: clash
+spec:
+  selector:
+    matchLabels:
+      application: clash
+      component: clash-us
+  template:
+    metadata:
+      labels:
+        application: clash
+        component: clash-us
+    spec:
+      containers:
+        - image: shoppon/clash:latest
+          name: clash
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
+          command:
+            - "clash"
+            - "-d"
+            - "/etc/clash/"
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+            requests:
+              cpu: 2000m
+              memory: 2Gi
+          volumeMounts:
+            - name: clash-etc
+              mountPath: /etc/clash/config.yaml
+              subPath: config.yaml
+              readOnly: true
+      volumes:
+        - name: clash-etc
+          configMap:
+            name: clash-etc

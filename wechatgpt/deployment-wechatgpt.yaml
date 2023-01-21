@@ -20,7 +20,7 @@ spec:
           # command: ["/bin/bash", "-c", "--"]
           # args: ["while true; do sleep 30; done;"]
           command: ["/bin/bash", "/usr/bin/start.sh"]
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           resources:
             limits:
               cpu: 2000m

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ceph-etc
+  namespace: rook-ceph
+data:
+  ceph.conf: |+
+    [global]
+    fsid = rook-ceph
+    mon host = 192.168.5.200
+    public network = 192.168.5.0/24
+    cluster network = 192.168.5.0/24
