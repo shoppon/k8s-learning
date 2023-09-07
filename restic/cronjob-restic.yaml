@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: restic
+  namespace: restic
+spec:
+  schedule: "0 18 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - image: shoppon/restic:latest
+              name: restic
+              # command: ["/bin/bash", "-c", "--"]
+              # args: ["while true; do sleep 30; done;"]
+              command:
+                - "restic"
+                - "-r"
+                - "/mnt/nas_backup"
+                - "-p"
+                - "/etc/restic/password"
+                - "backup"
+                - "/mnt/nas"
+                - "-vv"
+              imagePullPolicy: IfNotPresent
+              resources:
+                limits:
+                  cpu: 2000m
+                  memory: 2Gi
+                requests:
+                  cpu: 2000m
+                  memory: 2Gi
+              volumeMounts:
+                - name: backup-path
+                  mountPath: /mnt/nas_backup
+                - name: nas
+                  mountPath: /mnt/nas
+                - name: restic-etc
+                  mountPath: /etc/restic
+          restartPolicy: Never
+          volumes:
+            - name: backup-path
+              hostPath:
+                path: /mnt/nas_backup
+            - name: nas
+              hostPath:
+                path: /mnt/nas
+            - name: restic-etc
+              configMap:
+                name: restic-etc

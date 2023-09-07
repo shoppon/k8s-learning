@@ -1,0 +1,10 @@
+csiRBDPluginVolumeMount:
+  - name: ceph-etc
+    mountPath: /etc/ceph/ceph.conf
+    subPath: ceph.conf
+    readOnly: true
+
+csiCephFSPluginVolume:
+  - name: ceph-etc
+    configmap:
+      name: ceph-etc

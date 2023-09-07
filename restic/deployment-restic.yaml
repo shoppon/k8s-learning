@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: restic
+  namespace: restic
+spec:
+  selector:
+    matchLabels:
+      application: restic
+      component: restic
+  template:
+    metadata:
+      labels:
+        application: restic
+        component: restic
+    spec:
+      containers:
+        - image: shoppon/restic:latest
+          name: clash
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
+          command:
+            - "restic"
+            - "-r"
+            - "/mnt/nas_backup"
+            - "-p"
+            - "/etc/restic/password"
+            - "backup"
+            - "/mnt/nas"
+            - "-vv"
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+            requests:
+              cpu: 2000m
+              memory: 2Gi
+          volumeMounts:
+            - name: backup-path
+              mountPath: /mnt/nas_backup
+            - name: nas
+              mountPath: /mnt/nas
+            - name: restic-etc
+              mountPath: /etc/restic
+      volumes:
+        - name: backup-path
+          hostPath:
+            path: /mnt/nas_backup
+        - name: nas
+          hostPath:
+            path: /mnt/nas
+        - name: restic-etc
+          configMap:
+            name: restic-etc

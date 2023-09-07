@@ -20,6 +20,8 @@ spec:
           command: ["/bin/bash", "-c", "--"]
           args: ["while true; do sleep 30; done;"]
           imagePullPolicy: IfNotPresent
+          securityContext:
+            privileged: true
           env:
             - name: OS_USERNAME
               value: admin

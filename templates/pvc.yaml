@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: ceph-rbd-fio
 spec:
-  storageClassName: csi-rbd-sc
+  storageClassName: rook-ceph-block
   accessModes:
     - ReadWriteOnce
   resources:

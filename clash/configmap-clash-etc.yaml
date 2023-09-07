@@ -22,7 +22,7 @@ data:
         fallback: ['https://doh.dns.sb/dns-query', 'https://dns.cloudflare.com/dns-query', 'https://dns.twnic.tw/dns-query', 'tls://8.8.4.4:853']
         fallback-filter: { geoip: true, ipcidr: [240.0.0.0/4, 0.0.0.0/32] }
     proxies:
-        - { name: 'us', type: ss, server: 153.101.64.221, port: 17006, cipher: aes-256-gcm, password: 5be81841-7162-1160-29bd-329e584305bf, udp: true }
+        - { name: 'us', type: vmess, server: 153.101.64.226, port: 25001, uuid: 5be81841-7162-1160-29bd-329e584305bf, alterId: 0, cipher: auto, udp: true, network: ws, ws-opts: { path: /qwe123321ewq }, ws-path: /qwe123321ewq }
     proxy-groups:
         - { name: 极光加速, type: select, proxies: [ 'us' ] }
     rules:
