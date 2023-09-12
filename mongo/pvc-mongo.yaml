@@ -4,9 +4,9 @@ metadata:
   name: mongo
   namespace: mongo
 spec:
-  storageClassName: hostpath
+  storageClassName: rook-ceph-block
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 8Gi
+      storage: 60Gi

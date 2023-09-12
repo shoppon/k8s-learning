@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongo
+  name: mongo-nodeport
   namespace: mongo
 spec:
   type: NodePort
