@@ -13,6 +13,11 @@ data:
     from logging.handlers import SysLogHandler
     from socket import gethostbyname
 
+    PROXIES = {
+      'http': 'http://clash-all.clash.svc.cluster.local:7890',
+      'https': 'http://clash-all.clash.svc.cluster.local:7890'
+    }
+
 
     def get_logger():
         logger = logging.getLogger(__name__)
@@ -27,15 +32,15 @@ data:
 
 
     def get_current_dns():
-        return gethostbyname('shoppon.club')
+        return gethostbyname('shoppon.xyz')
 
 
     def get_current_ip():
-        return requests.get('http://jsonip.com').json().get('ip')
+        return requests.get('http://jsonip.com', timeout=5).json().get('ip')
 
 
     def config_dns(new_ip):
-        resp = requests.put('https://api.godaddy.com/v1/domains/shoppon.club/records/A', json=[{
+        resp = requests.put('https://api.godaddy.com/v1/domains/shoppon.xyz/records/A', json=[{
             'data': new_ip,
             'name': '@'
         }], headers={
@@ -43,7 +48,7 @@ data:
             'X-Shopper-Id': '39039331',
             'Content-Type': 'application/json',
             'Authorization': 'sso-key 9Zw16udsgXS_7PpmdPmfM1UGATWUzV7zJC:Qg2Khs5jEMiRJAA627psJ7'
-        })
+        }, timeout=10, proxies=PROXIES)
         logger.info(f'Status: {resp.status_code}')
 
 

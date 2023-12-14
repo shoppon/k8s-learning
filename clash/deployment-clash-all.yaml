@@ -24,13 +24,23 @@ spec:
             - "-d"
             - "/etc/clash/"
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            exec:
+              command:
+                - /usr/bin/curl
+                - -x
+                - http://127.0.0.1:7890
+                - https://www.google.com.hk
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
           resources:
             limits:
-              cpu: 2000m
-              memory: 2Gi
+              cpu: 500m
+              memory: 1Gi
             requests:
-              cpu: 2000m
-              memory: 2Gi
+              cpu: 500m
+              memory: 1Gi
           volumeMounts:
             - name: clash-etc
               mountPath: /etc/clash/config.yaml
