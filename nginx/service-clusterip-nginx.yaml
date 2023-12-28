@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: clash-all
+  namespace: clash
+spec:
+  type: ClusterIP
+  ports:
+    - name: clash-all
+      port: 7890
+      targetPort: 7890
+      protocol: TCP
+  selector:
+    application: clash
+    component: clash-all

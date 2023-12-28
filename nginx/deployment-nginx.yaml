@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: fclipboard
+spec:
+  selector:
+    matchLabels:
+      application: fclipboard
+      component: web
+  template:
+    metadata:
+      labels:
+        application: fclipboard
+        component: web
+    spec:
+      containers:
+        - name: web
+          image: nginx:latest
+          resources:
+            limits:
+              cpu: 200m
+              memory: 500Mi
+            requests:
+              cpu: 200m
+              memory: 500Mi
+          volumeMounts:
+            - mountPath: "/usr/share/nginx/html"
+              name: web
+      volumes:
+        - name: web
+          hostPath:
+            path: /Users/shoppon/code/fclipboard/build/web

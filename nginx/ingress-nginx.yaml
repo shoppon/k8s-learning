@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web
+  namespace: fclipboard
+  labels:
+    name: fclipboard-web
+spec:
+  rules:
+    - host: fclipboard-web.shoppon.club
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: clash-all
+                port:
+                  number: 7890
+    - host: proxy.shoppon.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: clash-all
+                port:
+                  number: 7890
+    - http:
+        paths:
+          - pathType: Prefix
+            path: "/proxy"
+            backend:
+              service:
+                name: clash-all
+                port:
+                  number: 7890

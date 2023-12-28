@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+  namespace: fclipboard
+spec:
+  type: NodePort
+  selector:
+    application: fclipboard
+    component: web
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 32700
