@@ -1,0 +1,38 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: squid
+  namespace: squid
+  labels:
+    name: squid
+spec:
+  rules:
+    - host: proxy.shoppon.xyz
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: squid
+                port:
+                  number: 3128
+    - host: proxy.shoppon.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: squid
+                port:
+                  number: 3128
+    - http:
+        paths:
+          - pathType: Prefix
+            path: "/proxy"
+            backend:
+              service:
+                name: squid
+                port:
+                  number: 3128
