@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: squid
+  namespace: squid
+spec:
+  selector:
+    matchLabels:
+      application: squid
+      component: squid
+  template:
+    metadata:
+      labels:
+        application: squid
+        component: squid
+    spec:
+      containers:
+        - image: shoppon/squid:latest
+          name: squid
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
+          command:
+            - "squid"
+            - "--foreground"
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 1000m
+              memory: 1Gi
