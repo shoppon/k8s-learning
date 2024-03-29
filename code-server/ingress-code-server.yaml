@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: code-server
+  namespace: code-server
+  labels:
+    name: code-server
+spec:
+  rules:
+    - host: code-server.shoppon.xyz
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: code-server
+                port:
+                  number: 8080

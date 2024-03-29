@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: code-server
+  namespace: code-server
+spec:
+  selector:
+    matchLabels:
+      application: code-server
+      component: code-server
+  template:
+    metadata:
+      labels:
+        application: code-server
+        component: code-server
+    spec:
+      containers:
+        - image: shoppon/code-server:latest
+          name: code-server
+          # command: ["/bin/bash", "-c", "--"]
+          # args: ["while true; do sleep 30; done;"]
+          command:
+            - "code-server"
+            - "--auth"
+            - "none"
+            - "--bind-addr"
+            - "0.0.0.0:8080"
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+            requests:
+              cpu: 2000m
+              memory: 2Gi
