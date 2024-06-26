@@ -7,8 +7,8 @@ spec:
   type: ClusterIP
   ports:
     - name: code-server
-      port: 8080
-      targetPort: 8080
+      port: 8999
+      targetPort: 8999
       protocol: TCP
   selector:
     application: code-server

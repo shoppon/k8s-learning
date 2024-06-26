@@ -16,19 +16,11 @@ spec:
     spec:
       hostNetwork: true
       containers:
-        - image: shoppon/samba:latest
+        - image: swr.cn-southwest-2.myhuaweicloud.com/shoppon/samba:20240626
           name: samba
-          # command: ["/bin/bash", "-c", "--"]
+          command: ["/bin/bash", "-c", "--"]
+          args: ["/usr/sbin/smbd --configfile /etc/samba_cephfs/samba.conf; while true; do sleep 30; done;"]
           # args: ["while true; do sleep 30; done;"]
-          command:
-            - "smbd"
-            - "-S"
-            - "-F"
-            - "--no-process-group"
-            - "--configfile"
-            - "/etc/samba_cephfs/samba.conf"
-            - "-d"
-            - "2"
           imagePullPolicy: IfNotPresent
           resources:
             limits:

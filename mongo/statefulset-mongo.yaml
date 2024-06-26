@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: mongo
-          image: mongo:latest
+          image: swr.cn-north-4.myhuaweicloud.com/shoppon/mongo:20240626
           imagePullPolicy: IfNotPresent
           resources:
             requests:

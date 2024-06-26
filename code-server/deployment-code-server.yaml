@@ -24,8 +24,11 @@ spec:
             - "--auth"
             - "none"
             - "--bind-addr"
-            - "0.0.0.0:8080"
+            - "0.0.0.0:8999"
           imagePullPolicy: IfNotPresent
+          securityContext:
+            runAsUser: 0
+            privileged: true
           resources:
             limits:
               cpu: 2000m
@@ -33,3 +36,97 @@ spec:
             requests:
               cpu: 2000m
               memory: 2Gi
+          volumeMounts:
+            - name: cinder-etc
+              mountPath: /etc/cinder/cinder.conf
+              subPath: cinder.conf
+              readOnly: true
+            - name: cinder-etc
+              mountPath: /etc/cinder/conf/backends.conf
+              subPath: backends.conf
+              readOnly: true
+            - name: etcceph
+              mountPath: /etc/ceph
+            - name: ceph-etc
+              mountPath: /etc/ceph/ceph.conf
+              subPath: ceph.conf
+              readOnly: true
+            - name: cinder-etc
+              mountPath: /etc/sudoers.d/kolla_cinder_sudoers
+              subPath: cinder_sudoers
+              readOnly: true
+            - name: cinder-etc
+              mountPath: /etc/sudoers.d/kolla_cinder_volume_sudoers
+              subPath: cinder_sudoers
+              readOnly: true
+            - name: cinder-etc
+              mountPath: /etc/cinder/rootwrap.conf
+              subPath: rootwrap.conf
+              readOnly: true
+            - name: cinder-etc
+              mountPath: /etc/cinder/rootwrap.d/volume.filters
+              subPath: volume.filters
+              readOnly: true
+            - name: dev
+              mountPath: /dev
+            - name: sys
+              mountPath: /sys
+            - name: multipath-conf
+              mountPath: /etc/multipath.conf
+            - name: multipath
+              mountPath: /etc/multipath
+            - name: udev
+              mountPath: /run/udev/
+            - name: host-opt
+              mountPath: /opt
+            - name: host-modules
+              mountPath: /lib/modules
+            - name: host-iscsi-dir
+              mountPath: /etc/iscsi/
+            - name: nvme-etc
+              mountPath: /etc/nvme/
+            - name: nvme-cli
+              mountPath: /usr/sbin/nvme
+      volumes:
+        - name: cinder-etc
+          configMap:
+            name: cinder-etc
+        - name: etcceph
+          emptyDir: {}
+        - name: ceph-etc
+          configMap:
+            name: ceph-etc
+            defaultMode: 0444
+        - name: dev
+          hostPath:
+            path: /dev
+        - name: sys
+          hostPath:
+            path: /sys
+        - name: multipath-conf
+          hostPath:
+            path: /etc/multipath.conf
+            type: FileOrCreate
+        - name: multipath
+          hostPath:
+            path: /etc/multipath
+        - name: udev
+          hostPath:
+            path: /run/udev/
+        - name: host-opt
+          hostPath:
+            path: /opt
+        - name: host-modules
+          hostPath:
+            path: /lib/modules
+        - name: host-iscsi-dir
+          hostPath:
+            path: /etc/iscsi/
+            type: DirectoryOrCreate
+        - name: nvme-etc
+          hostPath:
+            path: /etc/nvme/
+            type: DirectoryOrCreate
+        - name: nvme-cli
+          hostPath:
+            path: /usr/sbin/nvme

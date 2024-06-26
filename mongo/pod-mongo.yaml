@@ -13,7 +13,7 @@ spec:
         claimName: mongo
   containers:
     - name: mongo
-      image: mongo:latest
+      image: swr.cn-north-4.myhuaweicloud.com/shoppon/mongo:20240626
       resources:
         limits:
           cpu: 2000m

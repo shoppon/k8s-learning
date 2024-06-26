@@ -25,3 +25,12 @@ data:
     ceph:user_id = admin
     read list = @root, wxd
     read only = yes
+
+    [bowen]
+    vfs objects = ceph
+    path = /bowen
+    kernel share modes = no
+    ceph:config_file = /etc/ceph/ceph.conf
+    ceph:user_id = admin
+    read list = @root, peng
+    read only = yes
