@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pixel-ingress
+  namespace: nvidia-pixel
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    # cert-manager 相关注解
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - pixel1.shoppon.world
+      secretName: pixel-tls-cert # cert-manager 将自动创建此 Secret
+  rules:
+    - host: pixel1.shoppon.world
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nvidia-service
+                port:
+                  number: 80
