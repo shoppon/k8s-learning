@@ -1,0 +1,60 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# 基础资源
+resources:
+  - configmap-srs.yaml
+  - deployment-srs.yaml
+  - service-srs.yaml
+
+# 可选资源（通过注释控制）
+# - service-nodeport-srs.yaml
+# - ingress-srs.yaml
+
+# 生产环境资源（单独管理）
+# - configmap-srs-production.yaml
+# - statefulset-srs-cluster.yaml
+# - service-srs-cluster.yaml
+
+# 命名空间
+namespace: default
+
+# 通用标签
+commonLabels:
+  app: srs
+  version: v4.0
+
+# 名称前缀
+namePrefix: ""
+
+# 镜像标签替换
+images:
+  - name: srs
+    newTag: latest
+
+# ConfigMap生成器（如果需要从文件生成）
+# configMapGenerator:
+#   - name: srs-config
+#     files:
+#       - srs.conf
+
+# 资源修改
+patchesStrategicMerge:
+# - patch-resources.yaml
+
+# JSON 6902补丁
+# patchesJson6902:
+# - target:
+#     group: apps
+#     version: v1
+#     kind: Deployment
+#     name: srs
+#   patch: |-
+#     - op: replace
+#       path: /spec/replicas
+#       value: 2
+
+# 副本数量
+replicas:
+  - name: srs
+    count: 1

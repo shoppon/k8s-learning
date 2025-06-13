@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: srs
+  labels:
+    app: srs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: srs
+  template:
+    metadata:
+      labels:
+        app: srs
+    spec:
+      containers:
+      - name: srs
+        image: srs:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 1935
+          name: rtmp
+          protocol: TCP
+        - containerPort: 1985
+          name: api
+          protocol: TCP
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8000
+          name: webrtc
+          protocol: TCP
+        - containerPort: 5060
+          name: gb28181
+          protocol: UDP
+        env:
+        - name: CANDIDATE
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        volumeMounts:
+        - name: srs-config
+          mountPath: /srs.conf
+          subPath: srs.conf
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/summaries
+            port: 1985
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/v1/summaries
+            port: 1985
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: srs-config
+        configMap:
+          name: srs-config

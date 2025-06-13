@@ -1,0 +1,9 @@
+# .dockerignore for SRS
+.git
+.gitignore
+README.md
+*.yaml
+*.yml
+*.sh
+.DS_Store
+Thumbs.db

@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: srs-cluster
+  labels:
+    app: srs-cluster
+spec:
+  serviceName: srs-cluster-headless
+  replicas: 3
+  selector:
+    matchLabels:
+      app: srs-cluster
+  template:
+    metadata:
+      labels:
+        app: srs-cluster
+    spec:
+      containers:
+      - name: srs
+        image: srs:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 1935
+          name: rtmp
+        - containerPort: 1985
+          name: api
+        - containerPort: 8080
+          name: http
+        - containerPort: 8000
+          name: webrtc
+        - containerPort: 5060
+          name: gb28181
+          protocol: UDP
+        env:
+        - name: CANDIDATE
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        volumeMounts:
+        - name: srs-config
+          mountPath: /srs.conf
+          subPath: srs.conf
+        - name: srs-data
+          mountPath: /data
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/summaries
+            port: 1985
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/v1/summaries
+            port: 1985
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+      volumes:
+      - name: srs-config
+        configMap:
+          name: srs-config-production
+  volumeClaimTemplates:
+  - metadata:
+      name: srs-data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 10Gi
+      # storageClassName: fast-ssd

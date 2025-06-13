@@ -1,0 +1,192 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: srs-config-production
+  labels:
+    app: srs
+    env: production
+data:
+  srs.conf: |
+    # SRS生产环境配置
+    listen              1935;
+    max_connections     2000;
+    daemon              off;
+    srs_log_tank        console;
+    srs_log_level       warn;
+
+    # HTTP API配置
+    http_api {
+        enabled         on;
+        listen          1985;
+        crossdomain     on;
+        # 启用API统计
+        raw_api {
+            enabled             on;
+            allow_reload        on;
+            allow_query         on;
+            allow_update        on;
+        }
+    }
+
+    # HTTP服务器
+    http_server {
+        enabled         on;
+        listen          8080;
+        dir             ./objs/nginx/html;
+        crossdomain     on;
+    }
+
+    # WebRTC配置
+    rtc_server {
+        enabled on;
+        listen 8000;
+        # 使用环境变量设置候选IP
+        candidate $CANDIDATE;
+        # API over HTTP/2
+        api_as_candidates on;
+        # STUN服务器
+        resolve_api_domain on;
+        keep_api_domain on;
+        # 启用WebRTC to RTMP
+        rtc_to_rtmp on;
+    }
+
+    # 统计配置
+    stats {
+        network         0;
+        disk            sda vda xvda xvdb;
+    }
+
+    # 心跳配置
+    heartbeat {
+        enabled         on;
+        interval        9.9;
+        url             http://127.0.0.1:1985/api/v1/heartbeat;
+        device_id       "kubernetes-srs";
+        summaries       on;
+    }
+
+    # 默认虚拟主机
+    vhost __defaultVhost__ {
+        # HLS配置
+        hls {
+            enabled         on;
+            hls_path        ./objs/nginx/html;
+            hls_fragment    6;
+            hls_window      60;
+            hls_on_error    ignore;
+            hls_storage     disk;
+            # HLS切片清理
+            hls_dispose     30;
+            hls_wait_keyframe on;
+        }
+
+        # HTTP-FLV配置
+        http_remux {
+            enabled     on;
+            mount       [vhost]/[app]/[stream].flv;
+            hstrs       on;
+            # 启用CORS
+            allow_origin '*';
+        }
+
+        # WebRTC配置
+        rtc {
+            enabled     on;
+            rtmp_to_rtc on;
+            rtc_to_rtmp on;
+            # 启用NACK
+            nack on;
+            # 启用PLI
+            pli_for_rtmp on;
+        }
+
+        # 录制配置
+        dvr {
+            enabled      on;
+            dvr_path     /data/record/[app]/[stream]/[2006]/[01]/[02]/[stream]-[15]:[04]:[05].flv;
+            dvr_plan     session;
+            dvr_duration 30;
+            dvr_wait_keyframe on;
+        }
+
+        # 转发配置（集群模式）
+        forward {
+            enabled off;
+            destination 127.0.0.1:1936;
+        }
+
+        # 播放配置
+        play {
+            # 启用GOP缓存
+            gop_cache       on;
+            # 队列长度
+            queue_length    30;
+            # 启用混音
+            mix_correct     on;
+        }
+
+        # 推流配置
+        publish {
+            # 发布超时
+            mr off;
+            mr_latency 350;
+            # 首帧超时
+            firstpkt_timeout 20000;
+            # 普通包超时
+            normal_timeout 5000;
+        }
+
+        # 带宽测试
+        bandcheck {
+            enabled         on;
+            key             "35c9b402c12a7246868752e2878f7e0e";
+            interval        30;
+            limit_kbps      4000;
+        }
+
+        # GB28181配置
+        gb28181 {
+            enabled on;
+            listen 5060;
+            host $CANDIDATE;
+            # 自动创建频道
+            auto_create_channel on;
+            # SIP配置
+            sip {
+                enabled on;
+                listen 5060;
+                serial 34020000002000000001;
+                realm 3402000000;
+                ack_timeout 30;
+                keepalive_timeout 120;
+                # 注册间隔
+                invite_port_fixed on;
+                query_catalog_interval 60;
+            }
+            # RTP端口范围
+            rtp_port_min 58200;
+            rtp_port_max 58300;
+            # RTP超时
+            rtp_idle_timeout 30;
+        }
+
+        # 安全配置
+        security {
+            enabled on;
+            # 发布密钥
+            publish_key "your_publish_key_here";
+            # 播放密钥
+            play_key "your_play_key_here";
+        }
+    }
+
+    # 集群配置示例
+    vhost cluster.example.com {
+        cluster {
+            mode            local;
+            origin_cluster  on;
+            token_traverse  on;
+            vhost           __defaultVhost__;
+        }
+    }
